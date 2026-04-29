@@ -1,8 +1,153 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Uçuş Rezervasyonu";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<style>
+    .booking-container {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 700px;
+        margin: 30px auto;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+
+    .flight-select {
+        margin-bottom: 20px;
+    }
+
+    .flight-select select {
+        padding: 8px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        width: 250px;
+    }
+
+    .legend {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 25px;
+        font-size: 14px;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .box {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+    }
+
+    /* Rənglər */
+    .bg-empty { background-color: #63b371; }    /* Yaşıl */
+    .bg-selected { background-color: #4a90e2; } /* Mavi */
+    .bg-full { background-color: #d9534f; }     /* Qırmızı */
+
+    .plane-body {
+        background: white;
+        border-radius: 60px 60px 15px 15px;
+        padding: 40px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        border: 1px solid #e0e0e0;
+    }
+
+    .pilot-cabin {
+        text-align: center;
+        background: #f0f0f0;
+        padding: 20px;
+        border-radius: 40px 40px 10px 10px;
+        margin-bottom: 40px;
+        font-size: 24px;
+        color: #666;
+        font-weight: 300;
+    }
+
+    .seats-container {
+        display: flex;
+        justify-content: center;
+        gap: 40px; /* Keçid (aisle) boşluğu */
+    }
+
+    .seat-group {
+        display: grid;
+        grid-template-columns: repeat(3, 35px);
+        gap: 10px;
+    }
+
+    .seat {
+        width: 35px;
+        height: 35px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .seat:hover {
+        transform: scale(1.1);
+    }
+
+    .summary-section {
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+    }
+
+    .btn-reserve {
+        background-color: #4a90e2;
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 15px;
+    }
+
+    .btn-reserve:hover {
+        background-color: #357abd;
+    }
+</style>
+
+<div class="booking-container">
+    <div class="flight-select">
+        <label>Uçuş istiqaməti: </label>
+        <select>
+            <option>Bakı - London (450 AZN)</option>
+            <option>Bakı - İstanbul (200 AZN)</option>
+        </select>
+    </div>
+
+    <div class="legend">
+        <div class="legend-item"><div class="box bg-empty"></div> Boş</div>
+        <div class="legend-item"><div class="box bg-selected"></div> Seçdiyiniz</div>
+        <div class="legend-item"><div class="box bg-full"></div> Dolu</div>
+    </div>
+
+    <div class="plane-body">
+        <div class="pilot-cabin">Pilot Kabini</div>
+        
+        <div class="seats-container">
+            <div class="seat-group">
+                <div class="seat bg-empty"></div><div class="seat bg-empty"></div><div class="seat bg-empty"></div>
+                <div class="seat bg-full"></div><div class="seat bg-full"></div><div class="seat bg-empty"></div>
+                <div class="seat bg-empty"></div><div class="seat bg-empty"></div><div class="seat bg-empty"></div>
+            </div>
+
+            <div class="seat-group">
+                <div class="seat bg-empty"></div><div class="seat bg-empty"></div><div class="seat bg-empty"></div>
+                <div class="seat bg-empty"></div><div class="seat bg-empty"></div><div class="seat bg-selected"></div>
+                <div class="seat bg-selected"></div><div class="seat bg-full"></div><div class="seat bg-full"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="summary-section">
+        <p>Seçilən yer sayı: <strong>2</strong></p>
+        <p>Ümumi qiymət: <strong>900 AZN</strong></p>
+        <button class="btn-reserve">Rezerv et</button>
+    </div>
 </div>
