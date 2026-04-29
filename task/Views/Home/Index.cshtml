@@ -182,14 +182,12 @@
     });
 
     // Məlumatı bazaya göndər
-   async function reserveSeats() {
+  async function reserveSeats() {
     if (selectedSeats.length === 0) {
         alert("Zəhmət olmasa yer seçin!");
         return;
     }
 
-    // Seçilən yerlərin siyahısını bilet mesajı üçün hazırlayaq
-    const seatList = selectedSeats.join(', ');
     const totalAmount = document.getElementById('priceDisp').innerText;
     const destination = document.getElementById('locationSelect').selectedOptions[0].text;
 
@@ -197,7 +195,7 @@
         Location: destination,
         Count: selectedSeats.length,
         Price: parseInt(totalAmount),
-        SideNumber: seatList
+        SideNumber: selectedSeats.join(', ')
     };
 
     const response = await fetch('/Home/Reserve', {
@@ -207,12 +205,23 @@
     });
 
     if (response.ok) {
-        // Uğurlu olanda çıxacaq mesaj
-        alert(`🎫 BİLET ALINDI!\n\n📍 İstiqamət: ${destination}\n💺 Yerlər: ${seatList}\n💰 Ödənilən məbləğ: ${totalAmount} AZN\n\nUğurlu uçuşlar arzulayırıq!`);
+        alert(`🎫 BİLET ALINDI!\n\nYerlər: ${data.SideNumber}`);
+
+        // --- YENİ HİSSƏ: Seçilən yerləri qırmızı (dolu) et ---
+        document.querySelectorAll('.seat.bg-selected').forEach(seat => {
+            seat.classList.remove('bg-selected');
+            seat.classList.add('bg-full'); // Qırmızı rəng klası
+            seat.style.cursor = "not-allowed"; // Artıq klikləmək olmasın
+        });
+
+        // Seçimləri və ekranı sıfırla
+        selectedSeats = [];
+        document.getElementById('countDisp').innerText = "0";
+        document.getElementById('priceDisp').innerText = "0";
         
-        location.reload(); // Səhifəni yeniləyir ki, yerlər sıfırlansın
+        // Artıq location.reload() etmirik ki, qırmızı yerlər itməsin!
     } else {
-        alert("Xəta baş verdi. Zəhmət olmasa bazanı yoxlayın.");
+        alert("Xəta baş verdi.");
     }
 }
 </script>
