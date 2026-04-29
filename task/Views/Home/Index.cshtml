@@ -2,6 +2,7 @@
     ViewData["Title"] = "Uçuş Rezervasyonu";
 }
 
+
 <style>
     .booking-container {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -115,9 +116,9 @@
 <div class="booking-container">
     <div class="flight-select">
         <label>Uçuş istiqaməti: </label>
-        <select>
-            <option>Bakı - London (450 AZN)</option>
-            <option>Bakı - İstanbul (200 AZN)</option>
+        <select id="locationSelect">
+            <option value="450">Bakı - London (450 AZN)</option>
+            <option value="200">Bakı - İstanbul (200 AZN)</option>
         </select>
     </div>
 
@@ -129,25 +130,89 @@
 
     <div class="plane-body">
         <div class="pilot-cabin">Pilot Kabini</div>
-        
         <div class="seats-container">
             <div class="seat-group">
-                <div class="seat bg-empty"></div><div class="seat bg-empty"></div><div class="seat bg-empty"></div>
-                <div class="seat bg-full"></div><div class="seat bg-full"></div><div class="seat bg-empty"></div>
-                <div class="seat bg-empty"></div><div class="seat bg-empty"></div><div class="seat bg-empty"></div>
+                <div class="seat bg-empty" data-num="A1"></div>
+                <div class="seat bg-empty" data-num="A2"></div>
+                <div class="seat bg-empty" data-num="A3"></div>
+                <div class="seat bg-full" data-num="A4"></div>
+                <div class="seat bg-full" data-num="A5"></div>
+                <div class="seat bg-empty" data-num="A6"></div>
             </div>
-
             <div class="seat-group">
-                <div class="seat bg-empty"></div><div class="seat bg-empty"></div><div class="seat bg-empty"></div>
-                <div class="seat bg-empty"></div><div class="seat bg-empty"></div><div class="seat bg-selected"></div>
-                <div class="seat bg-selected"></div><div class="seat bg-full"></div><div class="seat bg-full"></div>
+                <div class="seat bg-empty" data-num="B1"></div>
+                <div class="seat bg-empty" data-num="B2"></div>
+                <div class="seat bg-empty" data-num="B3"></div>
+                <div class="seat bg-empty" data-num="B4"></div>
+                <div class="seat bg-empty" data-num="B5"></div>
+                <div class="seat bg-empty" data-num="B6"></div>
             </div>
         </div>
     </div>
 
     <div class="summary-section">
-        <p>Seçilən yer sayı: <strong>2</strong></p>
-        <p>Ümumi qiymət: <strong>900 AZN</strong></p>
-        <button class="btn-reserve">Rezerv et</button>
+        <p>Seçilən yer sayı: <strong id="countDisp">0</strong></p>
+        <p>Ümumi qiymət: <strong id="priceDisp">0</strong> AZN</p>
+        <button class="btn-reserve" onclick="reserveSeats()">Rezerv et</button>
     </div>
 </div>
+
+<script>
+    let selectedSeats = [];
+    const getPricePerSeat = () => parseInt(document.getElementById('locationSelect').value);
+
+    // Oturacaq seçimi
+    document.querySelectorAll('.seat').forEach(seat => {
+        seat.addEventListener('click', function() {
+            if (this.classList.contains('bg-full')) return; // Dolu yerə klik etmək olmaz
+
+            const seatNum = this.getAttribute('data-num');
+
+            if (this.classList.contains('bg-empty')) {
+                this.classList.replace('bg-empty', 'bg-selected');
+                selectedSeats.push(seatNum);
+            } else {
+                this.classList.replace('bg-selected', 'bg-empty');
+                selectedSeats = selectedSeats.filter(s => s !== seatNum);
+            }
+            
+            document.getElementById('countDisp').innerText = selectedSeats.length;
+            document.getElementById('priceDisp').innerText = selectedSeats.length * getPricePerSeat();
+        });
+    });
+
+    // Məlumatı bazaya göndər
+   async function reserveSeats() {
+    if (selectedSeats.length === 0) {
+        alert("Zəhmət olmasa yer seçin!");
+        return;
+    }
+
+    // Seçilən yerlərin siyahısını bilet mesajı üçün hazırlayaq
+    const seatList = selectedSeats.join(', ');
+    const totalAmount = document.getElementById('priceDisp').innerText;
+    const destination = document.getElementById('locationSelect').selectedOptions[0].text;
+
+    const data = {
+        Location: destination,
+        Count: selectedSeats.length,
+        Price: parseInt(totalAmount),
+        SideNumber: seatList
+    };
+
+    const response = await fetch('/Home/Reserve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
+
+    if (response.ok) {
+        // Uğurlu olanda çıxacaq mesaj
+        alert(`🎫 BİLET ALINDI!\n\n📍 İstiqamət: ${destination}\n💺 Yerlər: ${seatList}\n💰 Ödənilən məbləğ: ${totalAmount} AZN\n\nUğurlu uçuşlar arzulayırıq!`);
+        
+        location.reload(); // Səhifəni yeniləyir ki, yerlər sıfırlansın
+    } else {
+        alert("Xəta baş verdi. Zəhmət olmasa bazanı yoxlayın.");
+    }
+}
+</script>
